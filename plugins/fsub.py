@@ -1,15 +1,19 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from config import FORCE_SUB_CHANNEL, ADMINS
+from config import ADMINS
 from bot import Bot
 
-@Bot.on_message(filters.command("add_channel") & filters.user(ADMINS))  # Ensure only admins can run this command
-async def add_channel(client: Client, message: Message):
+# Initialize force_subscribe as None
+FORCE_SUB_CHANNEL = None
+
+@Bot.on_message(filters.command("set_force_channel") & filters.user(ADMINS))
+async def set_force_channel(client: Client, message: Message):
+    global FORCE_SUB_CHANNEL
     if FORCE_SUB_CHANNEL is not None:
         await message.reply_text("A force subscribe channel is already set.")
         return
 
-    # Extract channel ID or username from the command
+    # Extract the channel ID or username from the command
     if len(message.command) < 2:
         await message.reply_text("Please provide a valid channel ID or username.")
         return
@@ -30,8 +34,9 @@ async def add_channel(client: Client, message: Message):
     except Exception as e:
         await message.reply_text(f"Error: {e}")
 
-@Bot.on_message(filters.command("Rem_channel") & filters.user(ADMINS))  # Only admins can run this command
+@Bot.on_message(filters.command("Rem_channel") & filters.user(ADMINS))
 async def remove_channel(client: Client, message: Message):
+    global FORCE_SUB_CHANNEL
     if FORCE_SUB_CHANNEL is None:
         await message.reply_text("No force subscribe channel is set.")
     else:
