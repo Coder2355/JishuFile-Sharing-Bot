@@ -17,13 +17,13 @@ DB_NAME = os.environ.get("DB_NAME", "Speedwolf1")
 
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002134913785"))
 
-FORCE_SUB_CHANNEL = int(os.environ.get("FORCE_SUB_CHANNEL", None))
+FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL", None)
 
 
 START_PIC = os.environ.get("START_PIC", "https://telegra.ph/file/feb6dd0a1cb8576943c0f.jpg")
 FORCE_PIC = os.environ.get("FORCE_PIC", "https://vault.pictures/p/82768980717549f78d41bd8a07898cac")
 
-FILE_AUTO_DELETE = int(os.getenv("FILE_AUTO_DELETE", None)) # auto delete in seconds
+FILE_AUTO_DELETE = os.getenv("FILE_AUTO_DELETE", None) # auto delete in seconds
 
 
 PORT = os.environ.get("PORT", "8020")
