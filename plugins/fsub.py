@@ -1,7 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from config import ADMINS
-from bot import Bot
 
 # Initialize force_subscribe as None
 FORCE_SUB_CHANNEL = None
