@@ -5,8 +5,9 @@ from pyrogram import Client
 from pyrogram.enums import ParseMode
 import sys
 from datetime import datetime
-from config import API_HASH, API_ID, LOGGER, BOT_TOKEN, TG_BOT_WORKERS, FORCE_SUB_CHANNEL, CHANNEL_ID, PORT
+from config import API_HASH, API_ID, LOGGER, BOT_TOKEN, TG_BOT_WORKERS, CHANNEL_ID, PORT
 import pyrogram.utils
+from plugins.fsub import FORCE_SUB_CHANNEL
 
 pyrogram.utils.MIN_CHANNEL_ID = -1009999999999
 
