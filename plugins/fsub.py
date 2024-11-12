@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from config import FORCE_SUB_CHANNEL
-
+from bot import Bot
 
 @Bot.on_message(filters.command("add_channel") & filters.user(ADMINS))  # Ensure only admins can run this command
 async def add_channel(client: Client, message: Message):
