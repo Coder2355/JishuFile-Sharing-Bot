@@ -4,12 +4,12 @@ from config import ADMINS
 from bot import Bot
 
 # Initialize force_subscribe as None
-FORCE_SUB_CHANNEL = None
+FORCE_SUB_CHANNEL1 = None
 
 @Bot.on_message(filters.command("set_force_channel") & filters.user(ADMINS))
 async def set_force_channel(client: Client, message: Message):
-    global FORCE_SUB_CHANNEL
-    if FORCE_SUB_CHANNEL is not None:
+    global FORCE_SUB_CHANNEL1
+    if FORCE_SUB_CHANNEL1 is not None:
         await message.reply_text("A force subscribe channel is already set.")
         return
 
@@ -28,7 +28,7 @@ async def set_force_channel(client: Client, message: Message):
             return
         
         # Set force_subscribe to the provided channel ID if bot is admin
-        FORCE_SUB_CHANNEL = channel_id
+        FORCE_SUB_CHANNEL1 = channel_id
         await message.reply_text(f"Force subscribe channel has been set to: {channel_id}")
     
     except Exception as e:
@@ -36,10 +36,10 @@ async def set_force_channel(client: Client, message: Message):
 
 @Bot.on_message(filters.command("Rem_channel") & filters.user(ADMINS))
 async def remove_channel(client: Client, message: Message):
-    global FORCE_SUB_CHANNEL
-    if FORCE_SUB_CHANNEL is None:
+    global FORCE_SUB_CHANNEL1
+    if FORCE_SUB_CHANNEL1 is None:
         await message.reply_text("No force subscribe channel is set.")
     else:
         # Reset force_subscribe to None
-        FORCE_SUB_CHANNEL = None
+        FORCE_SUB_CHANNEL1 = None
         await message.reply_text("Force subscribe channel has been removed.")
