@@ -8,7 +8,7 @@ from pyrogram.enums import ParseMode
 from pyrogram.types import Message
 import sys
 from datetime import datetime
-from config import API_HASH, API_ID, LOGGER, BOT_TOKEN, TG_BOT_WORKERS, CHANNEL_ID, PORT, FORCE_SUB_CHANNEL
+from config import API_HASH, API_ID, LOGGER, BOT_TOKEN, TG_BOT_WORKERS, CHANNEL_ID, PORT, FORCE_SUB_CHANNEL, ADMINS
 import pyrogram.utils
 
 pyrogram.utils.MIN_CHANNEL_ID = -1009999999999
@@ -74,7 +74,7 @@ class Bot(Client):
 bot = Bot()
 
 
-@bot.on_message(filters.command("add_channel") & filters.user("your_admin_id"))
+@bot.on_message(filters.command("add_channel") & filters.user("ADMINS"))
 async def add_channel(bot: Client, message: Message):
     if len(message.command) < 2:
         await message.reply_text("Usage: /add_channel <channel_id>")
@@ -89,7 +89,7 @@ async def add_channel(bot: Client, message: Message):
         await message.reply_text(f"Failed to add channel: {e}")
 
 
-@bot.on_message(filters.command("rem_channel") & filters.user("your_admin_id"))
+@bot.on_message(filters.command("rem_channel") & filters.user("ADMINS"))
 async def remove_channel(bot: Client, message: Message):
     if len(message.command) < 2:
         await message.reply_text("Usage: /rem_channel <channel_id>")
