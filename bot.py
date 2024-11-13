@@ -1,8 +1,11 @@
+
+
 from aiohttp import web
 from plugins import web_server
 import pyromod.listen
-from pyrogram import Client
+from pyrogram import Client, filters
 from pyrogram.enums import ParseMode
+from pyrogram.types import Message
 import sys
 from datetime import datetime
 from config import API_HASH, API_ID, LOGGER, BOT_TOKEN, TG_BOT_WORKERS, CHANNEL_ID, PORT, FORCE_SUB_CHANNEL
@@ -10,7 +13,8 @@ import pyrogram.utils
 
 pyrogram.utils.MIN_CHANNEL_ID = -1009999999999
 
-
+# Force subscribe channels as a set to allow dynamic modification
+force_sub_channels = set(FORCE_SUB_CHANNEL) if isinstance(FORCE_SUB_CHANNEL, list) else {FORCE_SUB_CHANNEL}
 
 class Bot(Client):
     def __init__(self):
@@ -28,37 +32,35 @@ class Bot(Client):
         await super().start()
         usr_bot_me = await self.get_me()
         self.uptime = datetime.now()
+        self.invitelink = {}
 
-        if FORCE_SUB_CHANNEL:
+        for channel in force_sub_channels:
             try:
-                link = (await self.get_chat(FORCE_SUB_CHANNEL)).invite_link
+                link = (await self.get_chat(channel)).invite_link
                 if not link:
-                    await self.export_chat_invite_link(FORCE_SUB_CHANNEL)
-                    link = (await self.get_chat(FORCE_SUB_CHANNEL)).invite_link
-                self.invitelink = link
-            except Exception as a:
-                self.LOGGER(__name__).warning(a)
-                self.LOGGER(__name__).warning("Bot Can't Export Invite link From Force Sub Channel!")
-                self.LOGGER(__name__).warning(f"Please Double Check The FORCE_SUB_CHANNEL Value And Make Sure Bot Is Admin In Channel With Invite Users Via Link Permission, Current Force Sub Channel Value: {FORCE_SUB_CHANNEL}")
-                self.LOGGER(__name__).info("\nBot Stopped. https://t.me/MadflixBots_Support For Support")
+                    await self.export_chat_invite_link(channel)
+                    link = (await self.get_chat(channel)).invite_link
+                self.invitelink[channel] = link
+            except Exception as e:
+                self.LOGGER(__name__).warning(e)
+                self.LOGGER(__name__).warning(f"Failed to export invite link for channel ID {channel}")
                 sys.exit()
 
         try:
             db_channel = await self.get_chat(CHANNEL_ID)
             self.db_channel = db_channel
-            test = await self.send_message(chat_id = db_channel.id, text = "Hey 🖐")
+            test = await self.send_message(chat_id=db_channel.id, text="Hey 🖐")
             await test.delete()
         except Exception as e:
             self.LOGGER(__name__).warning(e)
-            self.LOGGER(__name__).warning(f"Make Sure Bot Is Admin In DB Channel, And Double Check The CHANNEL_ID Value, Current Value: {CHANNEL_ID}")
-            self.LOGGER(__name__).info("\nBot Stopped. Join https://t.me/MadflixBots_Support For Support")
+            self.LOGGER(__name__).warning("Please check the CHANNEL_ID value.")
             sys.exit()
 
         self.set_parse_mode(ParseMode.HTML)
-        self.LOGGER(__name__).info(f"Bot Running...!\n\nCreated By \nhttps://t.me/Madflix_Bots")
-        self.LOGGER(__name__).info(f"""ミ💖 MADFLIX BOTZ 💖彡""")
+        self.LOGGER(__name__).info("Bot Running...!")
         self.username = usr_bot_me.username
-        #web-response
+
+        # Start web server
         app = web.AppRunner(await web_server())
         await app.setup()
         bind_address = "0.0.0.0"
@@ -67,14 +69,40 @@ class Bot(Client):
     async def stop(self, *args):
         await super().stop()
         self.LOGGER(__name__).info("Bot Stopped...")
-            
 
 
+bot = Bot()
 
 
+@bot.on_message(filters.command("add_channel") & filters.user("your_admin_id"))
+async def add_channel(bot: Client, message: Message):
+    if len(message.command) < 2:
+        await message.reply_text("Usage: /add_channel <channel_id>")
+        return
 
-# Jishu Developer 
-# Don't Remove Credit 🥺
-# Telegram Channel @Madflix_Bots
-# Backup Channel @JishuBotz
-# Developer @JishuDeveloper
+    channel_id = message.command[1]
+    try:
+        await bot.get_chat(channel_id)
+        force_sub_channels.add(channel_id)
+        await message.reply_text(f"Channel {channel_id} added to force subscribe list.")
+    except Exception as e:
+        await message.reply_text(f"Failed to add channel: {e}")
+
+
+@bot.on_message(filters.command("rem_channel") & filters.user("your_admin_id"))
+async def remove_channel(bot: Client, message: Message):
+    if len(message.command) < 2:
+        await message.reply_text("Usage: /rem_channel <channel_id>")
+        return
+
+    channel_id = message.command[1]
+    if channel_id in force_sub_channels:
+        force_sub_channels.remove(channel_id)
+        await message.reply_text(f"Channel {channel_id} removed from force subscribe list.")
+    else:
+        await message.reply_text(f"Channel {channel_id} is not in the force subscribe list.")
+    
+
+# Only start the bot if this file is run directly
+if __name__ == "__main__":
+    bot.run()
