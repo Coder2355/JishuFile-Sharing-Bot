@@ -18,6 +18,10 @@ DB_NAME = os.environ.get("DB_NAME", "Speedwolf1")
 
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002134913785"))
 
+FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL", None)
+
+
+
 
 
 START_PIC = os.environ.get("START_PIC", "https://telegra.ph/file/feb6dd0a1cb8576943c0f.jpg")
@@ -37,18 +41,6 @@ try:
         ADMINS.append(int(x))
 except ValueError:
         raise Exception("Your Admins list does not contain valid integers.")
-
-try:
-    FORCE_SUB_CHANNEL=[]
-    for y in (os.environ.get("FORCE_SUB_CHANNEL", "FORCE_SUB_CHANNEL1").split()):
-        FORCE_SUB_CHANNEL.append(int(y))
-except ValueError:
-        raise Exception("Your Admins list does not contain valid integers.")
-
-
-
-
-
 
 
 
