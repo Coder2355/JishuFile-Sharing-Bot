@@ -16,7 +16,7 @@ DB_NAME = os.environ.get("DB_NAME", "Speedwolf1")
 
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002134913785"))
 
-FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL", None)
+FORCE_SUB_CHANNEL = int(os.environ.get("FORCE_SUB_CHANNEL", "-1002005436412"))
 
 
 
