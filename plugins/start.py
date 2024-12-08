@@ -13,16 +13,12 @@ jishudeveloper = madflixofficials
 file_auto_delete = humanize.naturaldelta(jishudeveloper)
 
 
-buttons = []
 
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
 
-    global buttons  # Access the global list
-
-    # Clear the buttons list at the start of the function
-    buttons.clear()
+    
     id = message.from_user.id
     if not await present_user(id):
         try:
@@ -32,10 +28,10 @@ async def start_command(client: Client, message: Message):
     text = message.text
     if len(text)>7:
         if client.link_one is not None and message.from_user.id not in ADMINS and not await is_requested_one(message):
-            buttons.append([
+            buttons = [[
                 InlineKeyboardButton(
                     "🎗 Request to Join Channel 1 🎗", url=client.link_one)
-            ])
+            ]]
 
         try:
             buttons.append([
