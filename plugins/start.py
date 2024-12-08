@@ -28,26 +28,26 @@ async def start_command(client: Client, message: Message):
     text = message.text
     if len(text)>7:
         if client.link_one is not None and message.from_user.id not in ADMINS and not await is_requested_one(message):
-            buttons.append([
+            buttons = [[
                 InlineKeyboardButton(
-                    "🎗 Request to Join Channel 1 🎗", url=client.link_one)
-            ])
-
-        try:
-            buttons.append([
-                InlineKeyboardButton(
-                    text='Try Again',
-                    url=f"https://t.me/{client.username}?start={message.command[1]}"
-                )
-            ])
-        except IndexError:
-            pass
-        # If buttons are added, prompt the user to join channels
-        if buttons:
+                    "🎗 Rᴇǫᴜᴇꜱᴛ Tᴏ Jᴏɪɴ Cʜᴀɴɴᴇʟ 1 🎗", url=client.link_one)
+            ]]
+            
+            try:
+                buttons.append(
+                      [
+                        InlineKeyboardButton(
+                             text = 'Try Again',
+                             url = f"https://t.me/{client.username}?start={message.command[1]}"
+                        )
+                    ]
+                    )
+            except (IndexError, ValueError):
+                pass
             await client.send_message(
                 chat_id=message.from_user.id,
-                text="**Please request to join the following channels to use this bot!**",
-                reply_markup=InlineKeyboardMarkup(buttons),
+                text="**Please request Join the Following Channels to use this Bot!**",
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons),
                 parse_mode=ParseMode.MARKDOWN
             )
             return
