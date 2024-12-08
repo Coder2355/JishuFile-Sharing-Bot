@@ -155,34 +155,7 @@ async def start_command(client: Client, message: Message):
         )
         return
 
-    
-@Bot.on_message(filters.command('start') & filters.private)
-async def not_joined(client: Client, message: Message):
-    buttons.append([
-        InlineKeyboardButton(text="Join Channel", url=client.invitelink)
-    ])
-      
-    try:
-        buttons.append([
-            InlineKeyboardButton(
-                text='Try Again',
-                url=f"https://t.me/{client.username}?start={message.command[1]}"
-            )
-        ])
-    except IndexError:
-        pass
-    # If buttons are added, prompt the user to join channels
-    if buttons:
-        await client.send_message(
-            chat_id=message.from_user.id,
-            text="**Please request to join the following channels to use this bot!**",
-            reply_markup=InlineKeyboardMarkup(buttons),
-            parse_mode=ParseMode.MARKDOWN
-        )
-        return
-
-
-    
+        
     
 
 
