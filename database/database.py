@@ -5,6 +5,9 @@ dbclient = pymongo.MongoClient(DB_URL)
 database = dbclient[DB_NAME]
 user_data = database['users']
 
+req_one = database['req_one'] 
+
+
 
 
 async def present_user(user_id : int):
@@ -26,6 +29,35 @@ async def full_userbase():
 async def del_user(user_id: int):
     user_data.delete_one({'_id': user_id})
     return
+
+async def is_requested_one(message):
+    user = await get_req_one(message.from_user.id)
+    if user:
+        return True
+    if message.from_user.id in ADMINS:
+        return True
+    return False
+    
+async def add_req_one(user_id):
+    try:
+        if not await get_req_one(user_id):
+            await req_one.insert_one({"user_id": int(user_id)})
+            return
+    except:
+        pass
+        
+async def get_req_one(user_id):
+    return req_one.find_one({"user_id": int(user_id)})
+
+async def get_user(self, user_id):
+        return await self.col.find_one({"user_id": int(user_id)})
+
+async def get_all_users(self):
+        return await self.col.find().to_list(None)
+
+async def delete_all_one():
+    req_one.delete_many({})
+
 
 
 
