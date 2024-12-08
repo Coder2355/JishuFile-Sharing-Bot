@@ -6,18 +6,23 @@ from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 from bot import Bot
 from config import ADMINS, FORCE_MSG, START_MSG, CUSTOM_CAPTION, DISABLE_CHANNEL_BUTTON, PROTECT_CONTENT, FILE_AUTO_DELETE
 from helper_func import subscribed, encode, decode, get_messages
-from database.database import add_user, del_user, full_userbase, present_user
+from database.database import add_user, del_user, full_userbase, present_user, is_requested_one, delete_all_one, get_user
 
 madflixofficials = FILE_AUTO_DELETE
 jishudeveloper = madflixofficials
 file_auto_delete = humanize.naturaldelta(jishudeveloper)
 
 
-
+buttons = []
 
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
+
+    global buttons  # Access the global list
+
+    # Clear the buttons list at the start of the function
+    buttons.clear()
     id = message.from_user.id
     if not await present_user(id):
         try:
@@ -26,6 +31,31 @@ async def start_command(client: Client, message: Message):
             pass
     text = message.text
     if len(text)>7:
+        if client.link_one is not None and message.from_user.id not in ADMINS and not await is_requested_one(message):
+            buttons.append([
+                InlineKeyboardButton(
+                    "🎗 Request to Join Channel 1 🎗", url=client.link_one)
+            ])
+
+        try:
+            buttons.append([
+                InlineKeyboardButton(
+                    text='Try Again',
+                    url=f"https://t.me/{client.username}?start={message.command[1]}"
+                )
+            ])
+        except IndexError:
+            pass
+        # If buttons are added, prompt the user to join channels
+        if buttons:
+            await client.send_message(
+                chat_id=message.from_user.id,
+                text="**Please request to join the following channels to use this bot!**",
+                reply_markup=InlineKeyboardMarkup(buttons),
+                parse_mode=ParseMode.MARKDOWN
+            )
+            return
+  
         try:
             base64_string = text.split(" ", 1)[1]
         except:
@@ -126,43 +156,34 @@ async def start_command(client: Client, message: Message):
         return
 
     
-
-
-
-    
-    
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
-    buttons = [
-        [
-            InlineKeyboardButton(text="Join Channel", url=client.invitelink)
-        ]
-    ]
+    buttons.append([
+        InlineKeyboardButton(text="Join Channel", url=client.invitelink)
+    ])
+      
     try:
-        buttons.append(
-            [
-                InlineKeyboardButton(
-                    text = 'Try Again',
-                    url = f"https://t.me/{client.username}?start={message.command[1]}"
-                )
-            ]
-        )
+        buttons.append([
+            InlineKeyboardButton(
+                text='Try Again',
+                url=f"https://t.me/{client.username}?start={message.command[1]}"
+            )
+        ])
     except IndexError:
         pass
+    # If buttons are added, prompt the user to join channels
+    if buttons:
+        await client.send_message(
+            chat_id=message.from_user.id,
+            text="**Please request to join the following channels to use this bot!**",
+            reply_markup=InlineKeyboardMarkup(buttons),
+            parse_mode=ParseMode.MARKDOWN
+        )
+        return
 
-    await message.reply(
-        text = FORCE_MSG.format(
-                first = message.from_user.first_name,
-                last = message.from_user.last_name,
-                username = None if not message.from_user.username else '@' + message.from_user.username,
-                mention = message.from_user.mention,
-                id = message.from_user.id
-            ),
-        reply_markup = InlineKeyboardMarkup(buttons),
-        quote = True,
-        disable_web_page_preview = True
-    )
 
+    
+    
 
 
 @Bot.on_message(filters.command('users') & filters.private & filters.user(ADMINS))
@@ -237,8 +258,8 @@ async def delete_files(messages, client, k):
 
 
 
-# Jishu Developer 
-# Don't Remove Credit 🥺
-# Telegram Channel @Madflix_Bots
-# Backup Channel @JishuBotz
-# Developer @JishuDeveloper
+@Bot.on_message(filters.command('purge_one') & filters.private & filters.user(ADMINS))
+async def purge_req_one(bot, message):
+    r = await message.reply("`processing...`")
+    await delete_all_one()
+    await r.edit("**Req db Cleared**" )
